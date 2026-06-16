@@ -2,6 +2,7 @@ package com.skillbridge.service;
 
 import com.skillbridge.entity.User;
 import com.skillbridge.entity.Workshop;
+import com.skillbridge.exception.BadRequestException;
 import com.skillbridge.exception.ForbiddenException;
 import com.skillbridge.exception.ResourceNotFoundException;
 import com.skillbridge.repository.UserRepository;
@@ -35,6 +36,20 @@ public class WorkshopService {
         if (workshop.getCategory() == null || workshop.getCategory().isBlank()) {
             workshop.setCategory("General");
         }
+
+        if (workshop.getTitle() == null || workshop.getTitle().isBlank()) {
+            throw new BadRequestException("Workshop title is required.");
+        }
+        if (workshop.getPrice() == null || workshop.getPrice().signum() < 0) {
+            throw new BadRequestException("Workshop price must be zero or greater.");
+        }
+        if (workshop.getAvailableSeats() == null || workshop.getAvailableSeats() < 1) {
+            throw new BadRequestException("Available seats must be at least 1.");
+        }
+        if (workshop.getScheduledDate() == null) {
+            throw new BadRequestException("Scheduled date is required.");
+        }
+
         workshop.setMentor(mentor);
         return workshopRepository.save(workshop);
     }
@@ -44,7 +59,12 @@ public class WorkshopService {
         return workshopRepository.findAll();
     }
 
-    // GET WORKSHOP BY ID
+    public List<Workshop> getWorkshopsByMentor(Long mentorId) {
+        userRepository.findById(mentorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Mentor not found with ID: " + mentorId));
+        return workshopRepository.findByMentorId(mentorId);
+    }
+
     public Workshop getWorkshopById(Long id) {
         return workshopRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Workshop not found with ID: " + id));

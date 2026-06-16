@@ -5,7 +5,9 @@ import com.skillbridge.entity.User;
 import com.skillbridge.entity.Workshop;
 import com.skillbridge.exception.BadRequestException;
 import com.skillbridge.exception.ConflictException;
+import com.skillbridge.exception.ForbiddenException;
 import com.skillbridge.exception.ResourceNotFoundException;
+import com.skillbridge.repository.BookingRepository;
 import com.skillbridge.repository.ReviewRepository;
 import com.skillbridge.repository.UserRepository;
 import com.skillbridge.repository.WorkshopRepository;
@@ -19,11 +21,17 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final WorkshopRepository workshopRepository;
+    private final BookingRepository bookingRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, WorkshopRepository workshopRepository) {
+    public ReviewService(
+            ReviewRepository reviewRepository,
+            UserRepository userRepository,
+            WorkshopRepository workshopRepository,
+            BookingRepository bookingRepository) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.workshopRepository = workshopRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     public Review addReview(Long learnerId, Long workshopId, Review review) {
@@ -38,6 +46,10 @@ public class ReviewService {
 
         if (reviewRepository.existsByLearnerIdAndWorkshopId(learnerId, workshopId)) {
             throw new ConflictException("You have already reviewed this workshop.");
+        }
+
+        if (!bookingRepository.existsByLearnerIdAndWorkshopId(learnerId, workshopId)) {
+            throw new ForbiddenException("You must enroll in this workshop before leaving a review.");
         }
 
         review.setLearner(learner);

@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bookings")
+@Table(
+        name = "bookings",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"learner_id", "workshop_id"})
+)
 public class Booking {
 
     @Id
@@ -27,8 +30,13 @@ public class Booking {
     @Column(nullable = false)
     private String status; // Expected: 'CONFIRMED' or 'CANCELLED'
 
-    public Booking() {
-        this.bookingDate = LocalDateTime.now();
+    public Booking() {}
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.bookingDate == null) {
+            this.bookingDate = LocalDateTime.now();
+        }
     }
 
     // --- GETTERS AND SETTERS ---

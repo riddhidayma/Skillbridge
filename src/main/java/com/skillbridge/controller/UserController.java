@@ -1,7 +1,13 @@
 package com.skillbridge.controller;
 
+import com.skillbridge.dto.LoginRequest;
+import com.skillbridge.dto.UserRegistrationRequest;
+import com.skillbridge.dto.UserUpdateRequest;
 import com.skillbridge.entity.User;
+import com.skillbridge.exception.UnauthorizedException;
 import com.skillbridge.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,45 +17,38 @@ public class UserController {
 
     private final UserService userService;
 
-    // Constructor Injection
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    // API: POST http://localhost:8080/api/users/register
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        // @RequestBody converts the incoming JSON into a Java 'User' object
+    public ResponseEntity<User> register(@Valid @RequestBody UserRegistrationRequest request) {
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setRole(request.getRole());
         User savedUser = userService.registerUser(user);
-        return ResponseEntity.ok(savedUser); // Returns HTTP 200 OK with the saved data
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    // API: GET http://localhost:8080/api/users/{id}
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updated = userService.updateUser(id, user.getName(), user.getEmail());
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest request) {
+        User updated = userService.updateUser(id, request.getName(), request.getEmail());
         return ResponseEntity.ok(updated);
     }
 
-    // Inside UserController.java
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginData) {
-        // Call the secure verification logic
+    public ResponseEntity<User> login(@Valid @RequestBody LoginRequest loginData) {
         User user = userService.verifyLogin(loginData.getEmail(), loginData.getPassword());
-
-        if (user != null) {
-            // Jackson will automatically hide the password in the response
-            // because of the @JsonProperty annotation you added earlier!
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.status(401).body("{\"message\": \"Invalid email or password\"}");
+        if (user == null) {
+            throw new UnauthorizedException("Invalid email or password");
         }
+        return ResponseEntity.ok(user);
     }
 }

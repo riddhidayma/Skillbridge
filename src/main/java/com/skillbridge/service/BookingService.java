@@ -5,8 +5,10 @@ import com.skillbridge.entity.User;
 import com.skillbridge.entity.Workshop;
 import com.skillbridge.exception.BadRequestException;
 import com.skillbridge.exception.ConflictException;
+import com.skillbridge.exception.ForbiddenException;
 import com.skillbridge.exception.ResourceNotFoundException;
 import com.skillbridge.repository.BookingRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.skillbridge.repository.UserRepository;
 import com.skillbridge.repository.WorkshopRepository;
 import org.springframework.stereotype.Service;
@@ -37,17 +39,27 @@ public class BookingService {
         Workshop workshop = workshopRepository.findById(workshopId)
                 .orElseThrow(() -> new ResourceNotFoundException("Workshop not found"));
 
-        if (bookingRepository.existsByLearnerIdAndWorkshopId(learnerId, workshopId)) {
+        if (!"LEARNER".equalsIgnoreCase(learner.getRole())) {
+            throw new ForbiddenException("Only learners can enroll in workshops.");
+        }
+
+        boolean alreadyBooked = bookingRepository.findByLearnerId(learnerId).stream()
+                .anyMatch(existing -> existing.getWorkshop() != null
+                        && workshopId.equals(existing.getWorkshop().getId()));
+        if (alreadyBooked) {
             throw new ConflictException("You have already enrolled in this workshop.");
         }
 
-        if (workshop.getAvailableSeats() <= 0) {
+        Integer availableSeats = workshop.getAvailableSeats();
+        if (availableSeats == null || availableSeats <= 0) {
             throw new BadRequestException("Workshop is completely sold out!");
         }
 
-        // 1. Reduce the available seats and update the workshop
-        workshop.setAvailableSeats(workshop.getAvailableSeats() - 1);
-        workshopRepository.save(workshop);
+        // 1. Reduce available seats atomically to avoid stale writes.
+        int updatedRows = workshopRepository.decrementAvailableSeatsIfPossible(workshopId);
+        if (updatedRows == 0) {
+            throw new ConflictException("Workshop seats were just taken. Please try again.");
+        }
 
         // 2. Create the booking record
         Booking booking = new Booking();
@@ -55,7 +67,11 @@ public class BookingService {
         booking.setWorkshop(workshop);
         booking.setStatus("CONFIRMED");
 
-        return bookingRepository.save(booking);
+        try {
+            return bookingRepository.save(booking);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("You have already enrolled in this workshop.");
+        }
     }
 
     public List<Booking> getBookingsByLearner(Long learnerId) {

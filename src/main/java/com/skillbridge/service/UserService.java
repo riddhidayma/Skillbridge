@@ -4,9 +4,8 @@ import com.skillbridge.entity.User;
 import com.skillbridge.exception.ConflictException;
 import com.skillbridge.exception.ResourceNotFoundException;
 import com.skillbridge.repository.UserRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
@@ -14,11 +13,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    @Autowired
-    private BCryptPasswordEncoder encoder;
-    // Constructor Injection (Best Practice)
-    public UserService(UserRepository userRepository) {
+    private final BCryptPasswordEncoder encoder;
+
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
+        this.encoder = encoder;
     }
 
     public User registerUser(User user) {

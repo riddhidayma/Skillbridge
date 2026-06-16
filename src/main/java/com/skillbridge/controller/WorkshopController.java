@@ -2,6 +2,7 @@ package com.skillbridge.controller;
 
 import com.skillbridge.entity.Workshop;
 import com.skillbridge.service.WorkshopService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,17 +23,20 @@ public class WorkshopController {
     @PostMapping("/mentor/{mentorId}")
     public ResponseEntity<Workshop> createWorkshop(@PathVariable Long mentorId, @RequestBody Workshop workshop) {
         Workshop savedWorkshop = workshopService.createWorkshop(mentorId, workshop);
-        return ResponseEntity.ok(savedWorkshop);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedWorkshop);
     }
 
-    // API: GET http://localhost:8080/api/workshops
     @GetMapping
     public ResponseEntity<List<Workshop>> getAllWorkshops() {
         List<Workshop> workshops = workshopService.getAllWorkshops();
         return ResponseEntity.ok(workshops);
     }
 
-    // API: GET http://localhost:8080/api/workshops/1
+    @GetMapping("/mentor/{mentorId}")
+    public ResponseEntity<List<Workshop>> getWorkshopsByMentor(@PathVariable Long mentorId) {
+        return ResponseEntity.ok(workshopService.getWorkshopsByMentor(mentorId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Workshop> getWorkshopById(@PathVariable Long id) {
         Workshop workshop = workshopService.getWorkshopById(id);

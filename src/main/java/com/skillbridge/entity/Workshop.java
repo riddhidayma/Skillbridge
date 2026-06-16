@@ -3,7 +3,7 @@ package com.skillbridge.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "workshops")
@@ -32,10 +32,16 @@ public class Workshop {
     private Integer availableSeats;
 
     @Column(name = "scheduled_date", nullable = false)
-    private LocalDateTime scheduledDate;
+    private Instant scheduledDate;
 
     @Column(nullable = false)
     private String category = "General";
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Version
+    private Long version;
 
     // Default Constructor
     public Workshop() {}
@@ -60,9 +66,15 @@ public class Workshop {
     public Integer getAvailableSeats() { return availableSeats; }
     public void setAvailableSeats(Integer availableSeats) { this.availableSeats = availableSeats; }
 
-    public LocalDateTime getScheduledDate() { return scheduledDate; }
-    public void setScheduledDate(LocalDateTime scheduledDate) { this.scheduledDate = scheduledDate; }
+    public Instant getScheduledDate() { return scheduledDate; }
+    public void setScheduledDate(Instant scheduledDate) { this.scheduledDate = scheduledDate; }
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 }

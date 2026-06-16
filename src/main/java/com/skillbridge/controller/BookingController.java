@@ -3,6 +3,8 @@ package com.skillbridge.controller;
 import com.skillbridge.dto.BookingRequest;
 import com.skillbridge.entity.Booking;
 import com.skillbridge.service.BookingService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +21,9 @@ public class BookingController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<Booking> bookWorkshop(@RequestBody BookingRequest request) {
+    public ResponseEntity<Booking> bookWorkshop(@Valid @RequestBody BookingRequest request) {
         Booking booking = bookingService.createBooking(request.getLearnerId(), request.getWorkshopId());
-        return ResponseEntity.ok(booking);
+        return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
 
     @GetMapping("/learner/{learnerId}")

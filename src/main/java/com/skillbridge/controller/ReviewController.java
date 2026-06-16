@@ -3,6 +3,8 @@ package com.skillbridge.controller;
 import com.skillbridge.dto.ReviewRequest;
 import com.skillbridge.entity.Review;
 import com.skillbridge.service.ReviewService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +21,11 @@ public class ReviewController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Review> addReview(@RequestBody ReviewRequest request) {
+    public ResponseEntity<Review> addReview(@Valid @RequestBody ReviewRequest request) {
         Review review = new Review();
         review.setRating(request.getRating());
         review.setComment(request.getComment());
-        return ResponseEntity.ok(reviewService.addReview(
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.addReview(
                 request.getLearnerId(),
                 request.getWorkshopId(),
                 review

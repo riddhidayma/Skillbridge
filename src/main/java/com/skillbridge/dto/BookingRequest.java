@@ -1,8 +1,13 @@
 package com.skillbridge.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public class BookingRequest {
 
+    @NotNull(message = "Learner ID is required.")
     private Long learnerId;
+
+    @NotNull(message = "Workshop ID is required.")
     private Long workshopId;
 
     public Long getLearnerId() {
