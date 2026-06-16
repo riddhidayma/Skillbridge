@@ -1,6 +1,8 @@
 package com.skillbridge.service;
 
 import com.skillbridge.entity.User;
+import com.skillbridge.exception.ConflictException;
+import com.skillbridge.exception.ResourceNotFoundException;
 import com.skillbridge.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,10 @@ public class UserService {
     }
 
     public User registerUser(User user) {
-        // 1. Get the plain text from the Angular request
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new ConflictException("Email already exists.");
+        }
+
         String plainPassword = user.getPassword();
 
         // 2. Transform it using the BCrypt bean we created earlier
@@ -36,9 +41,8 @@ public class UserService {
 
 
     public User getUserById(Long id) {
-        // Find user by ID, throw an error if they don't exist
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
     }
 
     public User findByEmail(String email) {
@@ -53,5 +57,17 @@ public class UserService {
             return user;
         }
         return null;
+    }
+
+    public User updateUser(Long id, String name, String email) {
+        User user = getUserById(id);
+        userRepository.findByEmail(email)
+                .filter(existing -> !existing.getId().equals(id))
+                .ifPresent(existing -> {
+                    throw new ConflictException("Email already exists.");
+                });
+        user.setName(name);
+        user.setEmail(email);
+        return userRepository.save(user);
     }
 }

@@ -27,9 +27,14 @@ public class UserController {
     // API: GET http://localhost:8080/api/users/{id}
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
-        // @PathVariable extracts the {id} from the URL
         User user = userService.getUserById(id);
         return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        User updated = userService.updateUser(id, user.getName(), user.getEmail());
+        return ResponseEntity.ok(updated);
     }
 
     // Inside UserController.java

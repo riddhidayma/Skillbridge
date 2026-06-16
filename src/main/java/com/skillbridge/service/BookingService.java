@@ -3,6 +3,9 @@ package com.skillbridge.service;
 import com.skillbridge.entity.Booking;
 import com.skillbridge.entity.User;
 import com.skillbridge.entity.Workshop;
+import com.skillbridge.exception.BadRequestException;
+import com.skillbridge.exception.ConflictException;
+import com.skillbridge.exception.ResourceNotFoundException;
 import com.skillbridge.repository.BookingRepository;
 import com.skillbridge.repository.UserRepository;
 import com.skillbridge.repository.WorkshopRepository;
@@ -29,13 +32,17 @@ public class BookingService {
     @Transactional
     public Booking createBooking(Long learnerId, Long workshopId) {
         User learner = userRepository.findById(learnerId)
-                .orElseThrow(() -> new RuntimeException("Learner not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Learner not found"));
 
         Workshop workshop = workshopRepository.findById(workshopId)
-                .orElseThrow(() -> new RuntimeException("Workshop not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Workshop not found"));
+
+        if (bookingRepository.existsByLearnerIdAndWorkshopId(learnerId, workshopId)) {
+            throw new ConflictException("You have already enrolled in this workshop.");
+        }
 
         if (workshop.getAvailableSeats() <= 0) {
-            throw new RuntimeException("Workshop is completely sold out!");
+            throw new BadRequestException("Workshop is completely sold out!");
         }
 
         // 1. Reduce the available seats and update the workshop

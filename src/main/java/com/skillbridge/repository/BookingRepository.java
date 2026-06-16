@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    // Custom method to fetch all bookings for a specific learner
     List<Booking> findByLearnerId(Long learnerId);
 
+    boolean existsByLearnerIdAndWorkshopId(Long learnerId, Long workshopId);
 }

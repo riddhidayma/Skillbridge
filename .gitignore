@@ -38,3 +38,5 @@ obj/
 
 # Build
 target/
+data/
+.mysql-data/

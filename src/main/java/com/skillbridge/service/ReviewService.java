@@ -3,6 +3,9 @@ package com.skillbridge.service;
 import com.skillbridge.entity.Review;
 import com.skillbridge.entity.User;
 import com.skillbridge.entity.Workshop;
+import com.skillbridge.exception.BadRequestException;
+import com.skillbridge.exception.ConflictException;
+import com.skillbridge.exception.ResourceNotFoundException;
 import com.skillbridge.repository.ReviewRepository;
 import com.skillbridge.repository.UserRepository;
 import com.skillbridge.repository.WorkshopRepository;
@@ -25,12 +28,16 @@ public class ReviewService {
 
     public Review addReview(Long learnerId, Long workshopId, Review review) {
         User learner = userRepository.findById(learnerId)
-                .orElseThrow(() -> new RuntimeException("Learner not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Learner not found"));
         Workshop workshop = workshopRepository.findById(workshopId)
-                .orElseThrow(() -> new RuntimeException("Workshop not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Workshop not found"));
 
         if (review.getRating() < 1 || review.getRating() > 5) {
-            throw new RuntimeException("Rating must be between 1 and 5");
+            throw new BadRequestException("Rating must be between 1 and 5");
+        }
+
+        if (reviewRepository.existsByLearnerIdAndWorkshopId(learnerId, workshopId)) {
+            throw new ConflictException("You have already reviewed this workshop.");
         }
 
         review.setLearner(learner);

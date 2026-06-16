@@ -2,6 +2,8 @@ package com.skillbridge.service;
 
 import com.skillbridge.entity.User;
 import com.skillbridge.entity.Workshop;
+import com.skillbridge.exception.ForbiddenException;
+import com.skillbridge.exception.ResourceNotFoundException;
 import com.skillbridge.repository.UserRepository;
 import com.skillbridge.repository.WorkshopRepository;
 import org.springframework.stereotype.Service;
@@ -24,14 +26,15 @@ public class WorkshopService {
     public Workshop createWorkshop(Long mentorId, Workshop workshop) {
         // 1. Find the user by ID
         User mentor = userRepository.findById(mentorId)
-                .orElseThrow(() -> new RuntimeException("Mentor not found with ID: " + mentorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Mentor not found with ID: " + mentorId));
 
-        // 2. Business Rule: Ensure the user is actually a Mentor
         if (!"MENTOR".equalsIgnoreCase(mentor.getRole())) {
-            throw new RuntimeException("Only users with the MENTOR role can create workshops.");
+            throw new ForbiddenException("Only users with the MENTOR role can create workshops.");
         }
 
-        // 3. Attach the mentor to the workshop and save
+        if (workshop.getCategory() == null || workshop.getCategory().isBlank()) {
+            workshop.setCategory("General");
+        }
         workshop.setMentor(mentor);
         return workshopRepository.save(workshop);
     }
@@ -44,6 +47,6 @@ public class WorkshopService {
     // GET WORKSHOP BY ID
     public Workshop getWorkshopById(Long id) {
         return workshopRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Workshop not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Workshop not found with ID: " + id));
     }
 }

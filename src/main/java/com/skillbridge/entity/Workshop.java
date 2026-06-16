@@ -34,6 +34,9 @@ public class Workshop {
     @Column(name = "scheduled_date", nullable = false)
     private LocalDateTime scheduledDate;
 
+    @Column(nullable = false)
+    private String category = "General";
+
     // Default Constructor
     public Workshop() {}
 
@@ -59,4 +62,7 @@ public class Workshop {
 
     public LocalDateTime getScheduledDate() { return scheduledDate; }
     public void setScheduledDate(LocalDateTime scheduledDate) { this.scheduledDate = scheduledDate; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 }
