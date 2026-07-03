@@ -1,6 +1,6 @@
 # SkillBridge - Workshop Management Platform
 
-SkillBridge is a full-stack workshop management platform that streamlines the process of organizing, managing, and participating in technical workshops. The application supports multiple user roles with secure authentication, enabling mentors to conduct workshops while allowing learners to discover and enroll in them through an intuitive interface.
+SkillBridge is a full-stack workshop management platform designed to simplify the organization and participation of technical workshops. The application provides separate interfaces for learners and mentors, enabling mentors to create and manage workshops while allowing learners to discover, enroll in, and track workshops through an intuitive web application.
 
 ---
 
@@ -8,10 +8,11 @@ SkillBridge is a full-stack workshop management platform that streamlines the pr
 
 ### Authentication
 - Secure user registration and login
-- Role-based authorization
-- Session management
+- Role-based authentication for Learners and Mentors
+- User profile management
 
 ### Learner
+- Register and log in
 - Browse available workshops
 - View workshop details
 - Enroll in workshops
@@ -19,16 +20,12 @@ SkillBridge is a full-stack workshop management platform that streamlines the pr
 - Update profile information
 
 ### Mentor
+- Register and log in
 - Create workshops
-- Update workshop information
+- Update workshop details
 - Manage workshop schedules
-- View enrolled learners
-- Personal dashboard
-
-### Admin
-- Manage users
-- Manage workshops
-- Monitor platform activities
+- View learner enrollments
+- Access mentor dashboard
 
 ---
 
@@ -37,7 +34,6 @@ SkillBridge is a full-stack workshop management platform that streamlines the pr
 ### Backend
 - Java
 - Spring Boot
-- Spring MVC
 - Spring Data JPA
 - Hibernate
 - REST APIs
@@ -52,9 +48,9 @@ SkillBridge is a full-stack workshop management platform that streamlines the pr
 - MySQL
 
 ### Tools
+- Maven
 - Git
 - GitHub
-- Maven
 
 ---
 
@@ -63,12 +59,13 @@ SkillBridge is a full-stack workshop management platform that streamlines the pr
 ```
 Angular Frontend
         │
- REST API Communication
-        │
+        │ REST API Calls
+        ▼
 Spring Boot Backend
         │
- Hibernate / JPA
+Spring Data JPA / Hibernate
         │
+        ▼
       MySQL
 ```
 
@@ -76,15 +73,15 @@ Spring Boot Backend
 
 ## Core Functionalities
 
-- User Authentication
-- Role-Based Access Control
-- Workshop Creation
+- User Registration & Login
+- Role-Based Authentication
+- Workshop Creation & Management
 - Workshop Enrollment
 - Mentor Dashboard
 - Learner Dashboard
-- Workshop Management
 - CRUD Operations
-- RESTful API Integration
+- REST API Integration
+- Database Management using Hibernate
 
 ---
 
@@ -93,10 +90,10 @@ Spring Boot Backend
 The application exposes REST APIs for:
 
 - Authentication
-- User Management
+- Learner Management
+- Mentor Management
 - Workshop Management
 - Enrollment Management
-- Dashboard Operations
 
 ---
 
@@ -105,23 +102,22 @@ The application exposes REST APIs for:
 ```
 SkillBridge
 │
-├── Backend
-│   ├── Controller
-│   ├── Service
-│   ├── Repository
-│   ├── Entity
-│   ├── DTO
-│   ├── Configuration
-│   └── Exception
+├── SkillBridge-Backend
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   └── resources
+│   │   └── test
+│   ├── pom.xml
+│   └── ...
 │
-├── Frontend
-│   ├── Components
-│   ├── Services
-│   ├── Models
-│   ├── Guards
-│   └── Routing
+├── SkillBridge-Frontend
+│   ├── src
+│   ├── angular.json
+│   ├── package.json
+│   └── ...
 │
-└── Database
+└── README.md
 ```
 
 ---
@@ -136,23 +132,65 @@ SkillBridge
 - Node.js
 - Angular CLI
 
-### Backend
+---
+
+### Clone the Repository
 
 ```bash
 git clone https://github.com/riddhidayma/Skillbridge.git
 
-cd Skillbridge/backend
+cd Skillbridge
+```
+
+---
+
+### Backend Setup
+
+Navigate to the backend project:
+
+```bash
+cd SkillBridge-Backend
+```
+
+Configure your MySQL database credentials in:
+
+```
+src/main/resources/application.properties
+```
+
+Build and run the backend:
+
+```bash
+mvn clean install
 
 mvn spring-boot:run
 ```
 
-### Frontend
+The backend server will start on:
+
+```
+http://localhost:8080
+```
+
+---
+
+### Frontend Setup
+
+Open another terminal and navigate to the frontend:
 
 ```bash
-cd frontend
+cd SkillBridge-Frontend
+```
 
+Install dependencies:
+
+```bash
 npm install
+```
 
+Run the Angular application:
+
+```bash
 ng serve
 ```
 
@@ -162,33 +200,34 @@ The application will be available at:
 http://localhost:4200
 ```
 
+> Ensure the backend server is running before starting the frontend.
+
 ---
 
 ## Learning Outcomes
 
-Through this project, I gained hands-on experience in:
+Through this project, I gained practical experience in:
 
-- Spring Boot application development
-- REST API design
-- Hibernate and JPA
-- Angular component development
-- MySQL database design
-- Authentication and authorization
-- Layered architecture
-- Frontend-backend integration
-- Git-based collaborative development
+- Building RESTful APIs using Spring Boot
+- Developing layered backend architecture
+- Using Hibernate and Spring Data JPA for database operations
+- Designing relational database schemas with MySQL
+- Developing responsive Angular components
+- Integrating frontend and backend applications
+- Implementing role-based application workflows
+- Managing source code using Git and GitHub
 
 ---
 
 ## Future Enhancements
 
 - Email notifications
-- Certificate generation
-- Attendance management
+- Workshop reminders
+- Attendance tracking
 - Workshop ratings and feedback
-- File upload support
-- Payment integration
-- Docker deployment
+- File uploads for workshop resources
+- Search and filtering
+- Docker containerization
 - CI/CD pipeline
 
 ---
@@ -197,6 +236,5 @@ Through this project, I gained hands-on experience in:
 
 **Riddhi Dayma**
 
-GitHub: https://github.com/riddhidayma
-
-LinkedIn: https://www.linkedin.com/in/riddhidayma
+- GitHub: https://github.com/riddhidayma
+- LinkedIn: https://www.linkedin.com/in/riddhidayma
